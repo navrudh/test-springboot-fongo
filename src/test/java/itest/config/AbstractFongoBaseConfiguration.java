@@ -1,13 +1,19 @@
 package itest.config;
 
+import com.github.fakemongo.Fongo;
+import com.mongodb.MongoClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import com.github.fakemongo.Fongo;
-import com.mongodb.Mongo;
-
-public abstract class AbstractFongoBaseConfiguration extends AbstractMongoConfiguration{
+@ComponentScan(basePackages = "") // in case your config is not present in package root
+@EnableMongoRepositories(basePackages = "")  // in case your config is not present in package root
+@Configuration
+public abstract class AbstractFongoBaseConfiguration extends AbstractMongoConfiguration {
 
     @Autowired
     private Environment env;
@@ -17,8 +23,9 @@ public abstract class AbstractFongoBaseConfiguration extends AbstractMongoConfig
         return env.getRequiredProperty("spring.data.mongodb.database");
     }
 
+    @Bean
     @Override
-    public Mongo mongo() throws Exception {
-        return new Fongo(getDatabaseName()).getMongo();
+    public MongoClient mongoClient() {
+      return new Fongo(getDatabaseName()).getMongo();
     }
 }
